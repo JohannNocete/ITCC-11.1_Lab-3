@@ -130,10 +130,168 @@ public class InvoiceSystem {
     }
 
     private static void manageServices() {
-    
+        
+        System.out.println("=== Service Management ===");
+        System.out.println("1. Add Service");
+        System.out.println("2. View Services");
+        System.out.println("3. Update Service");
+        System.out.println("4. Delete Service");
+        System.out.print("Enter your choice: ");
+        int choice = scanner.nextInt();
+        scanner.nextLine();
+        switch (choice) {
+            case 1:
+                addService();
+                break;
+            case 2:
+                viewService();
+                break;
+            case 3:
+                updateService();
+                break;
+            case 4:
+                deleteService();
+                break;
+            default:
+                System.out.println("Invalid choice.");
+        }
     }
+
+    private static void addService() {
+        System.out.print("Enter service name: ");
+        String name = scanner.nextLine();
+        String query = "INSERT INTO services (name) VALUES (?)";
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, name);
+            stmt.executeUpdate();
+            System.out.println("Service added successfully.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void viewService() {
+        String query = "SELECT * FROM services";
+        try (Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(query)) {
+            while (rs.next()) {
+                System.out.println(rs.getInt("id") + ". " + rs.getString("name"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void updateService() {
+        System.out.print("Enter service ID to update: ");
+        int id = scanner.nextInt();
+        scanner.nextLine();
+        System.out.print("Enter new service name: ");
+        String newName = scanner.nextLine();
+        String query = "UPDATE services SET name=? WHERE id=?";
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, newName);
+            stmt.setInt(2, id);
+            stmt.executeUpdate();
+            System.out.println("Service updated successfully.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void deleteService() {
+        System.out.print("Enter service ID to delete: ");
+        int id = scanner.nextInt();
+        String query = "DELETE FROM services WHERE id=?";
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, id);
+            stmt.executeUpdate();
+            System.out.println("Service deleted successfully.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     private static void manageInvoices() {
 
+    System.out.println("=== Invoice Management ===");
+        System.out.println("1. Add Invoice");
+        System.out.println("2. View Invoices");
+        System.out.println("3. Update Invoice");
+        System.out.println("4. Delete Invoice");
+        System.out.print("Enter your choice: ");
+        int choice = scanner.nextInt();
+        scanner.nextLine();
+        switch (choice) {
+            case 1:
+                addInvoice();
+                break;
+            case 2:
+                viewInvoices();
+                break;
+            case 3:
+                updateInvoice();
+                break;
+            case 4:
+                deleteInvoice();
+                break;
+            default:
+                System.out.println("Invalid choice.");
+        }
     }
+
+    private static void addInvoice() {
+        System.out.print("Enter invoice name: ");
+        String name = scanner.nextLine();
+        String query = "INSERT INTO invoices (name) VALUES (?)";
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, name);
+            stmt.executeUpdate();
+            System.out.println("Invoice added successfully.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void viewInvoices() {
+        String query = "SELECT * FROM invoices";
+        try (Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(query)) {
+            while (rs.next()) {
+                System.out.println(rs.getInt("id") + ". " + rs.getString("name"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void updateInvoice() {
+        System.out.print("Enter invoice ID to update: ");
+        int id = scanner.nextInt();
+        scanner.nextLine();
+        System.out.print("Enter new invoice name: ");
+        String newName = scanner.nextLine();
+        String query = "UPDATE invoices SET name=? WHERE id=?";
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, newName);
+            stmt.setInt(2, id);
+            stmt.executeUpdate();
+            System.out.println("Invoice updated successfully.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void deleteInvoice() {
+        System.out.print("Enter invoice ID to delete: ");
+        int id = scanner.nextInt();
+        String query = "DELETE FROM invoices WHERE id=?";
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, id);
+            stmt.executeUpdate();
+            System.out.println("Invoice deleted successfully.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
 }
