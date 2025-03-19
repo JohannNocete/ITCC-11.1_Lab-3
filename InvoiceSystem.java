@@ -213,12 +213,11 @@ public class InvoiceSystem {
 
 
     private static void manageInvoices() {
-
-    System.out.println("=== Invoice Management ===");
+        System.out.println("=== Invoice Management ===");
         System.out.println("1. Add Invoice");
         System.out.println("2. View Invoices");
-        System.out.println("3. Update Invoice");
-        System.out.println("4. Delete Invoice");
+        System.out.println("3. Add Service to Invoice");
+        System.out.println("4. View Client Invoices");
         System.out.print("Enter your choice: ");
         int choice = scanner.nextInt();
         scanner.nextLine();
@@ -230,65 +229,73 @@ public class InvoiceSystem {
                 viewInvoices();
                 break;
             case 3:
-                updateInvoice();
+                addServiceToInvoice();
                 break;
             case 4:
-                deleteInvoice();
+                viewClientInvoices();
                 break;
             default:
                 System.out.println("Invalid choice.");
         }
     }
-
+    
     private static void addInvoice() {
+        System.out.print("Enter client ID: ");
+        int clientId = scanner.nextInt();
+        scanner.nextLine();
         System.out.print("Enter invoice name: ");
-        String name = scanner.nextLine();
-        String query = "INSERT INTO invoices (name) VALUES (?)";
+        String invoiceName = scanner.nextLine();
+        String query = "INSERT INTO invoices (client_id, invoice_name, date_created) VALUES (?, ?, NOW())";
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, name);
+            stmt.setInt(1, clientId);
+            stmt.setString(2, invoiceName);
             stmt.executeUpdate();
             System.out.println("Invoice added successfully.");
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
-
+    
     private static void viewInvoices() {
         String query = "SELECT * FROM invoices";
         try (Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(query)) {
             while (rs.next()) {
-                System.out.println(rs.getInt("id") + ". " + rs.getString("name"));
+                System.out.println(rs.getInt("id") + ". " + rs.getString("invoice_name") + " (Client ID: " + rs.getInt("client_id") + ")");
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
-
-    private static void updateInvoice() {
-        System.out.print("Enter invoice ID to update: ");
-        int id = scanner.nextInt();
-        scanner.nextLine();
-        System.out.print("Enter new invoice name: ");
-        String newName = scanner.nextLine();
-        String query = "UPDATE invoices SET name=? WHERE id=?";
+    
+    private static void addServiceToInvoice() {
+        System.out.print("Enter invoice ID: ");
+        int invoiceId = scanner.nextInt();
+        System.out.print("Enter service ID: ");
+        int serviceId = scanner.nextInt();
+        System.out.print("Enter hours for the service: ");
+        int hours = scanner.nextInt();
+        String query = "INSERT INTO invoice_services (invoice_id, service_id, hours) VALUES (?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, newName);
-            stmt.setInt(2, id);
+            stmt.setInt(1, invoiceId);
+            stmt.setInt(2, serviceId);
+            stmt.setInt(3, hours); 
             stmt.executeUpdate();
-            System.out.println("Invoice updated successfully.");
+            System.out.println("Service added to invoice successfully.");
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
-
-    private static void deleteInvoice() {
-        System.out.print("Enter invoice ID to delete: ");
-        int id = scanner.nextInt();
-        String query = "DELETE FROM invoices WHERE id=?";
+    
+    private static void viewClientInvoices() {
+        System.out.print("Enter client ID: ");
+        int clientId = scanner.nextInt();
+        String query = "SELECT * FROM invoices WHERE client_id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setInt(1, id);
-            stmt.executeUpdate();
-            System.out.println("Invoice deleted successfully.");
+            stmt.setInt(1, clientId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                System.out.println(rs.getInt("id") + ". " + rs.getString("invoice_name") + " (Created on: " + rs.getTimestamp("date_created") + ")");
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
